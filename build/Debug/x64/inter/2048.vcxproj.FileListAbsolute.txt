@@ -1,0 +1,2 @@
+C:\code\2048\build\Debug\x64\out\raylib.dll
+C:\code\2048\build\Debug\x64\inter\2048.vcxproj.CopyComplete
