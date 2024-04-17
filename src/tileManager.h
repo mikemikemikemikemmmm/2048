@@ -52,7 +52,7 @@ public:
 	};
 	void handleDeleteTileObj() {
 		std::forward_list<TileObj*> waitToBeDeletedList;
-		for (const auto& tileObj : tileObjContainer) {
+		for (auto& tileObj : tileObjContainer) {
 			if (tileObj.isNeedToBeDeleted()) {
 				waitToBeDeletedList.emplace_front(&tileObj);
 			}
