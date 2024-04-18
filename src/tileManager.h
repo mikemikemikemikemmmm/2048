@@ -2,6 +2,7 @@
 #include <array>
 #include <forward_list>
 #include <utility>
+#include <memory>
 #include <tuple>
 #include <cstdlib> 
 #include <vector> 
@@ -12,12 +13,14 @@
 #include "gameObj/tile.h"
 #include "gameObj/matrix.h"
 class TileManager {
-public:
+private:
 	using TilePtrMatrix = std::array<std::array<TileObj*, MATRIX_COL_NUM>, MATRIX_ROW_NUM>;
 	using IndexSet = std::unordered_set<std::pair<int, int>>;
 	const int rowLen = MATRIX_ROW_NUM;
 	const int colLen = MATRIX_COL_NUM;
 	TilePtrMatrix tileObjPtrMatrix;
+public:
+	std::shared_ptr<Font> fontPtr = std::make_shared<Font>(GetFontDefault());
 	std::forward_list<TileObj> tileObjContainer;
 	void generateNewTile() {
 		std::vector<MatrixIndex> emptyIndexList;
@@ -32,35 +35,54 @@ public:
 		if (listSize == 0) {
 			return;
 		}
-		int randomIndex = std::rand() % listSize;
-		auto randomMatrixIndex = emptyIndexList[randomIndex];
+		const int randomIndex = std::rand() % listSize;
+		const auto& randomMatrixIndex = emptyIndexList[randomIndex];
 		const int& x = randomMatrixIndex.x;
 		const int& y = randomMatrixIndex.y;
-		tileObjContainer.emplace_front(MatrixIndex{ x, y });
+		tileObjContainer.emplace_front(MatrixIndex{ x, y }, fontPtr);
 		TileObj* const newTilePtr = &tileObjContainer.front();
 		tileObjPtrMatrix[y][x] = newTilePtr;
+		int c = 0;
+		for (auto&t: tileObjContainer) {
+			++c;
+		}
+		if (c>16) {
+		LOG("container");
+		LOG(c);
+		}
 	};
 	void drawAllTiles() {
 		for (auto& tileObj : tileObjContainer) {
 			tileObj.drawSelf();
 		}
 	};
-	void deleteTilePtrFromMatrix(const int x, const int y) {
-		auto targetTilePtr = tileObjPtrMatrix[y][x];
-		(*targetTilePtr).setState(TileObj::State::Minifing);
-		tileObjPtrMatrix[y][x] = nullptr;
+	void handleBeMergedTile(
+		const int& currentX,
+		const int& currentY,
+		const int& targetX,
+		const int& targetY 
+	) {
+		auto& targetTilePtr = tileObjPtrMatrix[currentY][currentX];
+		(*targetTilePtr).setState(TileObj::State::BeMerged);
+		(*targetTilePtr).setTargetPosition(MatrixIndex{ targetX,targetY }.toPosition());
+		tileObjPtrMatrix[currentY][currentX] = nullptr;
 	};
 	void handleDeleteTileObj() {
-		std::forward_list<TileObj*> waitToBeDeletedList;
+		std::forward_list< TileObj*> waitToBeDeletedList;
 		for (auto& tileObj : tileObjContainer) {
-			if (tileObj.isNeedToBeDeleted()) {
+			if (tileObj.isReadyToBeDeleted()) {
 				waitToBeDeletedList.emplace_front(&tileObj);
 			}
 		}
 		//delete tile obj
 		for (auto& tileObjPtr : waitToBeDeletedList) {
 			tileObjContainer.remove_if(
-				[tileObjPtr](auto& tileObj) { return &tileObj == tileObjPtr; }
+				[tileObjPtr](auto& tileObj) {
+					if (&tileObj == tileObjPtr) {
+						LOG("remove")
+					}
+					return &tileObj == tileObjPtr; 
+				}
 			);
 		}
 	};
@@ -85,20 +107,20 @@ public:
 					tileObjPtrMatrix[mergeOtherY][x]->getLevel();
 				if (isSameLevel) { //can merge
 					tileObjPtrMatrix[mergeOtherY][x]->increaseLevel();
-					mergeOtherY = -1;//reset
-					deleteTilePtrFromMatrix(x, y);//matrix[y][x]is merged by matrix[mergeOtherY][x]
+					handleBeMergedTile(x, y,x,mergeOtherY);//matrix[y][x]is merged by matrix[mergeOtherY][x]
+					mergeOtherY = -1;//reset				
 				}
 				else { //not same level, can't merge.
 					mergeOtherY = y; 
 				}
 			}
 			//sort zero
-			int y = 0;
-			for (int currentY = y; currentY < rowLen;++currentY) {
-				auto& currentTilePtr = tileObjPtrMatrix[currentY][x];
+			int notNullY = 0;
+			for (int currentY = 0; currentY < rowLen ;++currentY) {
+				TileObj* currentTilePtr = tileObjPtrMatrix[currentY][x];
 				if (currentTilePtr != nullptr) {
-					swapTilePtrByIndex({ x,currentY }, { x,y});
-					++y;
+					swapTilePtrByIndex({ x,currentY }, { x,notNullY });
+					++notNullY;
 				}
 			}
 		}
@@ -121,20 +143,20 @@ public:
 					tileObjPtrMatrix[y][mergeOtherX]->getLevel();
 				if (isSameLevel) { //merge
 					tileObjPtrMatrix[y][mergeOtherX]->increaseLevel();
+					handleBeMergedTile(x, y, mergeOtherX, y);
 					mergeOtherX = -1;//reset
-					deleteTilePtrFromMatrix(x, y);
 				}
 				else { //not same level, can't merge.
 					mergeOtherX = x;
 				}
 			}
 			//sort zero
-			int x = colLen-1;
-			for (int currentX = x; currentX >=0; --currentX) {
+			int notNullX = colLen-1;
+			for (int currentX = notNullX; currentX >=0; --currentX) {
 				auto& currentTilePtr = tileObjPtrMatrix[y][currentX];
 				if (currentTilePtr != nullptr) {
-					swapTilePtrByIndex({ currentX,y }, { x,y });
-					--x;
+					swapTilePtrByIndex({ currentX,y }, { notNullX,y });
+					--notNullX;
 				}
 			}
 		}
@@ -157,56 +179,56 @@ public:
 					tileObjPtrMatrix[mergeOtherY][x]->getLevel();
 				if (isSameLevel) { //merge
 					tileObjPtrMatrix[mergeOtherY][x]->increaseLevel();
+					handleBeMergedTile(x, y, x, mergeOtherY);
 					mergeOtherY = -1;//reset
-					deleteTilePtrFromMatrix(x, y);
 				}
 				else { //not same level, can't merge.
 					mergeOtherY = y; //current y try to merge other
 				}
 			}
 			//sort zero
-			int y = rowLen-1;
-			for (int currentY = y; currentY >=0; --currentY) {
+			int notNullY = rowLen-1;
+			for (int currentY = notNullY; currentY >=0; --currentY) {
 				auto& currentTilePtr = tileObjPtrMatrix[currentY][x];
 				if (currentTilePtr != nullptr) {
-					swapTilePtrByIndex({ x,currentY }, { x,y });
-					--y;
+					swapTilePtrByIndex({ x,currentY }, { x,notNullY });
+					--notNullY;
 				}
 			}
 		}
 	};
 	void setNewTileMatrixByPressLeft() {
 		for (int y = 0; y < rowLen; ++y) {
-			int notEmptyTileX = -1;
+			int mergeOtherX = -1;
 			//merge
 			for (int x = 0; x < colLen; ++x) {
 				 auto&  currentTilePtr = tileObjPtrMatrix[y][x];
 				if (currentTilePtr == nullptr) {
 					continue;
 				}
-				if (notEmptyTileX < 0) {
-					notEmptyTileX = x;//current x try to merge other
+				if (mergeOtherX < 0) {
+					mergeOtherX = x;//current x try to merge other
 					continue;
 				}
 				const bool isSameLevel =
 					currentTilePtr->getLevel() ==
-					tileObjPtrMatrix[y][notEmptyTileX]->getLevel();
+					tileObjPtrMatrix[y][mergeOtherX]->getLevel();
 				if (isSameLevel) { //merge
-					tileObjPtrMatrix[y][notEmptyTileX]->increaseLevel();
-					notEmptyTileX = -1;//reset
-					deleteTilePtrFromMatrix(x, y);
+					tileObjPtrMatrix[y][mergeOtherX]->increaseLevel();
+					handleBeMergedTile(x, y, mergeOtherX, y);
+					mergeOtherX = -1;//reset
 				}
 				else { //not same level, can't merge.
-					notEmptyTileX = x;
+					mergeOtherX = x;
 				}
 			}
 			//sort zero
-			int x = 0;
-			for (int currentX = x; currentX < colLen; ++currentX) {
+			int notNullX = 0;
+			for (int currentX = notNullX; currentX < colLen; ++currentX) {
 				auto& currentTilePtr = tileObjPtrMatrix[y][currentX];
 				if (currentTilePtr != nullptr) {
-					swapTilePtrByIndex({ currentX,y }, { x,y });
-					++x;
+					swapTilePtrByIndex({ currentX,y }, { notNullX,y });
+					++notNullX;
 				}
 			}
 		}
@@ -222,7 +244,7 @@ public:
 			tileObjPtrMatrix[i1.y][i1.x]->setTargetPosition(i1.toPosition());
 		}
 	};
-	bool testIsSingleTileGameOverByBPS(const int& x, const int& y) {
+	bool testIsSingleTileGameOverByBPS(const int& x, const int& y) const {
 		if (x >= colLen || y >= rowLen) {
 			return true;
 		}

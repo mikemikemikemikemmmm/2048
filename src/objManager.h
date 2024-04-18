@@ -18,6 +18,7 @@ public:
 	TileManager tileManager;
 	void drawAllObj() {
 		matrixObj.drawSelf();
+		tileManager.handleDeleteTileObj();
 		tileManager.drawAllTiles();
 	};
 	void whenKeyPress(const KeyPressDirection& direction) {
@@ -40,7 +41,6 @@ public:
 				break;
 			}
 		};
-		tileManager.handleDeleteTileObj();
 		tileManager.generateNewTile();
 	};
 	bool checkIsGameOver() {
@@ -48,7 +48,7 @@ public:
 	};
 	bool checkIsGameWin() {
 		for (const auto& tileObj : tileManager.tileObjContainer) {
-			if (tileObj.getLevel()>=TILE_MAX_LEVEL) { //TODO
+			if (tileObj.getLevel()>=TILE_MAX_LEVEL) { 
 				return true;
 			}
 		}

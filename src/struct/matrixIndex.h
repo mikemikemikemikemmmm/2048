@@ -19,8 +19,8 @@ struct MatrixIndex
     }
     Position toPosition() const{
         return Position{
-            this->x * (TILE_INTERVAL_WIDTH + TILE_WIDTH)+ TILE_INTERVAL_WIDTH ,
-            this->y * (TILE_INTERVAL_WIDTH + TILE_HEIGHT)+ TILE_INTERVAL_WIDTH
+            this->x * (TILE_INTERVAL_WIDTH + TILE_WIDTH)+ TILE_INTERVAL_WIDTH +MATRIX_START_X ,
+            this->y * (TILE_INTERVAL_WIDTH + TILE_HEIGHT)+ TILE_INTERVAL_WIDTH + MATRIX_START_Y
         };
     }
 };
