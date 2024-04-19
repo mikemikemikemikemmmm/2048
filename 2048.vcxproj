@@ -151,6 +151,9 @@
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gameObj\base.cpp" />
     <ClCompile Include="src\gameObj\matrix.cpp" />
+    <ClCompile Include="src\gameObj\tile.cpp" />
+    <ClCompile Include="src\objManager.cpp" />
+    <ClCompile Include="src\tileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game.h" />

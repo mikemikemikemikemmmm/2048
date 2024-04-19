@@ -5,6 +5,6 @@ public:
 	Position pos;
 	void setPosition(const Position& pos);
 	virtual void drawSelf() = 0;
-	BaseObj(const Position& startPos) :pos(startPos) {};
+	BaseObj(const Position& startPos);
 	virtual ~BaseObj() {};
 };

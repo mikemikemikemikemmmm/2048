@@ -3,3 +3,6 @@ C:\code\2048\src\const.h;C:\code\2048\build\Debug\x64\inter\const.obj
 C:\code\2048\src\game.cpp;C:\code\2048\build\Debug\x64\inter\game.obj
 C:\code\2048\src\gameObj\base.cpp;C:\code\2048\build\Debug\x64\inter\base.obj
 C:\code\2048\src\gameObj\matrix.cpp;C:\code\2048\build\Debug\x64\inter\matrix.obj
+C:\code\2048\src\gameObj\tile.cpp;C:\code\2048\build\Debug\x64\inter\tile.obj
+C:\code\2048\src\objManager.cpp;C:\code\2048\build\Debug\x64\inter\objManager.obj
+C:\code\2048\src\tileManager.cpp;C:\code\2048\build\Debug\x64\inter\tileManager.obj

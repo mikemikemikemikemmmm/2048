@@ -1,5 +1,10 @@
-﻿  const.h
+﻿  2048.cpp
+  const.h
   game.cpp
+  base.cpp
   matrix.cpp
+  tile.cpp
+  objManager.cpp
+  tileManager.cpp
   正在產生程式碼...
   2048.vcxproj -> C:\code\2048\build\Debug\x64\out\2048.exe
