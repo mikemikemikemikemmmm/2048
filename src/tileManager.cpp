@@ -39,7 +39,7 @@ void TileManager::drawAllTiles() {
 	}
 }
 
-inline void TileManager::handleBeMergedTile(const int& currentX, const int& currentY, const int& targetX, const int& targetY) {
+void TileManager::handleBeMergedTile(const int& currentX, const int& currentY, const int& targetX, const int& targetY) {
 	auto& targetTilePtr = tileObjPtrMatrix[currentY][currentX];
 	(*targetTilePtr).setState(TileObj::State::BeMerged);
 	(*targetTilePtr).setTargetPosition(MatrixIndex{ targetX,targetY }.toPosition());
@@ -63,7 +63,7 @@ void TileManager::handleDeleteTileObj() {
 	}
 }
 
-inline void TileManager::setTileNewTargetPositionByPtr(TileObj* tilePtr, const MatrixIndex& newIndex) {
+void TileManager::setTileNewTargetPositionByPtr(TileObj* tilePtr, const MatrixIndex& newIndex) {
 	(*tilePtr).setPosition(newIndex.toPosition());
 }
 
