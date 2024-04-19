@@ -31,9 +31,10 @@ public:
 		const MatrixIndex& startIndex);
 private:
 	Position targetPosition;
-	int level = 0;
+	int level = TILE_START_LEVEL;
+	Vector2 textSize = 
+		MeasureTextEx(GetFontDefault(), TILE_TEXT_LIST[TILE_START_LEVEL], FONT_SIZE, 0);
 	bool isMoving = false;
 	float scale = TILE_SCALE_START;
 	Position frameSpeed = {0,0};
-	State state = State::Normal;
-};
+	State state = State::Normal;};

@@ -24,27 +24,9 @@ constexpr float TILE_SCALE_VAR = static_cast<float>((1- TILE_SCALE_START)/ TILE_
 //font
 constexpr int FONT_SIZE = static_cast<int>(TILE_WIDTH / 3.5);
 
-#ifdef _DEBUG
-//tile level for debug
-constexpr int TILE_MAX_LEVEL = 3;
-constexpr std::array< Color, TILE_MAX_LEVEL + 1> TILE_INNER_COLOR_LIST{
-	Color{238,228,218,255},
-	Color{238,225,201,255},
-	Color{243,178,122,255},
-	Color{246,150,100,255},
-};
-constexpr std::array< Color, TILE_MAX_LEVEL + 1> TILE_FONT_COLOR_LIST{
-	Color{119,110,101,255},
-	Color{119,110,101,255},
-	Color{ 249,246,242,255 },
-	Color{ 249,246,242,255 },
-};
-constexpr std::array<const char*, TILE_MAX_LEVEL + 1> TILE_TEXT_LIST{
-	"2","4","8","16"
-};
-#else
-//tile level for release
+//tile level
 constexpr int TILE_MAX_LEVEL = 10;
+constexpr int TILE_START_LEVEL = 0;
 constexpr std::array< Color, TILE_MAX_LEVEL+1> TILE_INNER_COLOR_LIST{
 	Color{238,228,218,255},
 	Color{238,225,201,255},
@@ -74,7 +56,6 @@ constexpr std::array< Color, TILE_MAX_LEVEL + 1> TILE_FONT_COLOR_LIST{
 constexpr std::array<const char*, TILE_MAX_LEVEL+1> TILE_TEXT_LIST{
 	"2","4","8","16","32","64","128","256","512","1024","2048"
 };
-#endif
 
 
 //matrix

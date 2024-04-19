@@ -20,6 +20,7 @@ void TileObj::increaseLevel() {
 	}
 	else {
 		++level;
+		textSize = MeasureTextEx(GetFontDefault(), TILE_TEXT_LIST[level], FONT_SIZE, 0);
 	}
 }
 
@@ -97,11 +98,9 @@ void TileObj::drawBackgound() {
 }
 
 const Position TileObj::getTextStartPoint() const {
-	Vector2 targetTextSize =
-		MeasureTextEx(GetFontDefault(), TILE_TEXT_LIST[level], FONT_SIZE, 0);
 	return {
-		static_cast<int>(pos.x + ((TILE_WIDTH - targetTextSize.x) / 2)),
-		static_cast<int>(pos.y + ((TILE_HEIGHT - targetTextSize.y) / 2))
+		static_cast<int>(pos.x + ((TILE_WIDTH - textSize.x) / 2)),
+		static_cast<int>(pos.y + ((TILE_HEIGHT - textSize.y) / 2))
 	};
 }
 
